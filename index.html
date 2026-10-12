@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111019">
+<title>The Fool | Learning System</title>
+
+<style>
+:root {
+  --bg: #111019;
+  --panel: #211f30;
+  --gold: #e4c47a;
+  --text: #f5f1e9;
+  --muted: #b7b2c8;
+  --line: #403a52;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+header {
+  text-align: center;
+  padding: 30px 16px 22px;
+  background: radial-gradient(ellipse at top, #383049, var(--bg) 75%);
+}
+header small {
+  color: var(--muted);
+  letter-spacing: 3px;
+}
+header h1 {
+  color: var(--gold);
+  font-size: 35px;
+  letter-spacing: 5px;
+  margin: 14px 0 8px;
+}
+header p { color: var(--muted); font-size: 13px; }
+main { max-width: 680px; margin: auto; padding: 12px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 17px;
+  margin-bottom: 14px;
+}
+h2 { color: var(--gold); font-size: 18px; margin: 0 0 14px; }
+.muted { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.stat {
+  background: #2c293d;
+  padding: 12px 4px;
+  border-radius: 10px;
+  text-align: center;
+}
+.stat span { color: var(--muted); font-size: 10px; }
+.stat strong { display: block; color: var(--gold); font-size: 24px; margin-top: 7px; }
+.track { height: 7px; background: #403a52; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+.fill { height: 100%; width: 0; background: var(--gold); transition: width .25s; }
+select, button, textarea {
+  font: inherit;
+  border-radius: 9px;
+  padding: 11px;
+}
+select, textarea {
+  background: #171522;
+  border: 1px solid var(--line);
+  color: var(--text);
+  width: 100%;
+}
+button {
+  background: #66532d;
+  color: #fff3d3;
+  border: 1px solid var(--gold);
+  cursor: pointer;
+}
+button:active { opacity: .75; }
+.primary { width: 100%; margin-top: 12px; font-weight: bold; }
+.mission {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.mission:last-child { border-bottom: 0; }
+.mission h3 { font-size: 15px; line-height: 1.5; margin: 6px 0; }
+.tag { color: var(--gold); font-size: 12px; }
+.actions { display: flex; gap: 7px; margin-top: 10px; }
+.actions button { flex: 1; padding: 9px 3px; font-size: 12px; }
+.done { color: #a8ddbf; font-size: 13px; }
+.topic { margin: 15px 0; }
+.topic-line { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.topic .track { margin: 7px 0; }
+textarea { resize: vertical; }
+footer { text-align: center; padding: 20px; color: var(--muted); font-size: 11px; letter-spacing: 1px; }
+</style>
+</head>
+
+<body>
+<header>
+  <small>SEFIROTH • PERSONAL DEVELOPMENT</small>
+  <h1>THE FOOL</h1>
+  <p>Knowledge · Discipline · Strategy</p>
+  <p id="date"></p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>✦ The Fool's Journey</h2>
+    <div class="stats">
+      <div class="stat"><span>LEVEL</span><strong id="level">1</strong></div>
+      <div class="stat"><span>TOTAL EXP</span><strong id="xp">0</strong></div>
+      <div class="stat"><span>MISI</span><strong id="count">0/0</strong></div>
+    </div>
+    <p class="muted" id="next"></p>
+    <div class="track"><div class="fill" id="levelBar"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>✦ Daily Oracle</h2>
+    <p class="muted">Pilih bidang yang ingin diprioritaskan hari ini.</p>
+    <select id="focus">
+      <option value="all">Semua bidang</option>
+      <option value="Akademik">Akademik</option>
+      <option value="Logika">Logika</option>
+      <option value="Memori">Memori</option>
+      <option value="Wawasan">Wawasan</option>
+    </select>
+    <button class="primary" id="planBtn">Susun Jadwal Adaptif</button>
+    <p class="muted">Jadwal menggunakan penguasaan materi dan waktu pengulangan. Atur waktu belajar sesuai kegiatan sekolahmu.</p>
+  </section>
+
+  <section class="card">
+    <h2>✦ Daily Missions</h2>
+    <p class="muted">Kerjakan latihan terlebih dahulu. Setelah itu, nilai tingkat kesulitannya dengan jujur.</p>
+    <div id="missions"></div>
+  </section>
+
+  <section class="card">
+    <h2>✦ Knowledge Status</h2>
+    <div id="topics"></div>
+  </section>
+
+  <section class="card">
+    <h2>✦ Catatan Strategi</h2>
+    <textarea id="notes" rows="4" placeholder="Apa yang kamu pelajari? Apa kesalahanmu? Apa yang perlu diulang?"></textarea>
+    <button class="primary" id="saveNote">Simpan Catatan</button>
+    <p class="muted" id="noteStatus"></p>
+  </section>
+
+  <footer>THE FOOL · YOUR JOURNEY BEGINS</footer>
+</main>
+
+<script>
+const KEY = "the-fool-progress-v1";
+const DAY = 86400000;
+
+const topicSeed = [
+  ["mat", "Matematika", "Akademik"],
+  ["fis", "Fisika", "Akademik"],
+  ["kim", "Kimia dan Biologi", "Akademik"],
+  ["log", "Penalaran Numerik", "Logika"],
+  ["ded", "Pola dan Deduksi", "Logika"],
+  ["mem", "Hafalan Aktif", "Memori"],
+  ["rep", "Pengulangan Materi", "Memori"],
+  ["waw", "Membaca Kritis", "Wawasan"]
+];
+
+function dateKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+}
+
+function newTopics() {
+  return topicSeed.map(([id,name,category]) => ({
+    id, name, category, mastery: 40, nextReview: 0
+  }));
+}
+
+function createState() {
+  return {
+    day: dateKey(),
+    xp: 0,
+    topics: newTopics(),
+    missions: [],
+    notes: ""
+  };
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KEY));
+    if (!saved || !Array.isArray(saved.topics)) return createState();
+
+    if (saved.day !== dateKey()) {
+      saved.day = dateKey();
+      saved.missions = [];
+    }
+
+    saved.xp = Number(saved.xp) || 0;
+    saved.notes = saved.notes || "";
+    return saved;
+  } catch (e) {
+    return createState();
+  }
+}
+
+let state = loadState();
+
+function saveState() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(state));
+  } catch (e) {
+    alert("Data belum bisa disimpan. Periksa izin atau ruang penyimpanan browser.");
+  }
+}
+
+function missionTitle(topic) {
+  if (topic.category === "Akademik")
+    return `Pelajari konsep ${topic.name}, lalu kerjakan 5 soal.`;
+  if (topic.category === "Logika")
+    return `Kerjakan 5 latihan ${topic.name} dan jelaskan alasanmu.`;
+  if (topic.category === "Memori")
+    return `Ingat kembali materi tanpa melihat catatan: ${topic.name}.`;
+  return `Baca satu materi ${topic.name}, lalu tulis 3 ide utama.`;
+}
+
+function buildSchedule() {
+  const focus = document.getElementById("focus").value;
+  const now = Date.now();
+
+  const ranked = state.topics
+    .filter(t => focus === "all" || t.category === focus)
+    .map(t => ({
+      ...t,
+      priority: (100 - t.mastery) +
+        (t.nextReview <= now ? 30 : 0)
+    }))
+    .sort((a,b) => b.priority - a.priority);
+
+  const chosen = ranked.slice(0, 4);
+  const today = dateKey();
+
+  const oldMissions = new Map(
+    state.missions.map(m => [m.topicId, m])
+  );
+
+  state.missions = chosen.map((t,i) => {
+    const old = oldMissions.get(t.id);
+
+    // Jangan mengganti misi yang sudah dikerjakan.
+    if (old && old.completed) return old;
+
+    return {
+      id: `${today}-${t.id}`,
+      topicId: t.id,
+      title: missionTitle(t),
+      minutes: t.mastery < 40 ? 25 : 20,
+      xp: 25,
+      completed: false
+    };
+  });
+
+  render();
+  saveState();
+}
+
+function rateMission(id, rating) {
+  const mission = state.missions.find(m => m.id === id);
+  if (!mission || mission.completed) return;
+
+  const topic = state.topics.find(t => t.id === mission.topicId);
+  if (!topic) return;
+
+  const gain = {hard: 5, okay: 10, easy: 15}[rating];
+  const review = {hard: 0, okay: 1, easy: 3}[rating];
+
+  topic.mastery = Math.min(100, topic.mastery + gain);
+  topic.nextReview = Date.now() + review * DAY;
+
+  mission.completed = true;
+  mission.rating = rating;
+  state.xp += mission.xp;
+
+  render();
+  saveState();
+}
+
+function render() {
+  const done = state.missions.filter(m => m.completed).length;
+  const level = Math.floor(state.xp / 100) + 1;
+  const progress = state.xp % 100;
+
+  document.getElementById("date").textContent =
+    new Date().toLocaleDateString("id-ID", {
+      weekday:"long", day:"numeric", month:"long", year:"numeric"
+    });
+
+  document.getElementById("level").textContent = level;
+  document.getElementById("xp").textContent = state.xp;
+  document.getElementById("count").textContent =
+    `${done}/${state.missions.length}`;
+  document.getElementById("next").textContent =
+    `${100-progress} EXP menuju level berikutnya`;
+  document.getElementById("levelBar").style.width = progress + "%";
+
+  const missionBox = document.getElementById("missions");
+  missionBox.replaceChildren();
+
+  if (!state.missions.length) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "Pilih bidang, lalu tekan Susun Jadwal Adaptif.";
+    missionBox.append(p);
+  }
+
+  state.missions.forEach(m => {
+    const topic = state.topics.find(t => t.id === m.topicId);
+    const item = document.createElement("div");
+    item.className = "mission";
+
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = `${topic.category} · ${m.minutes} menit`;
+
+    const title = document.createElement("h3");
+    title.textContent = m.title;
+
+    item.append(tag,title);
+
+    if (m.completed) {
+      const result = document.createElement("p");
+      result.className = "done";
+      result.textContent = `✓ Selesai · +${m.xp} EXP · ${m.rating}`;
+      item.append(result);
+    } else {
+      const hint = document.createElement("p");
+      hint.className = "muted";
+      hint.textContent = "Pilih penilaian setelah latihan selesai.";
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      [["hard","Sulit"],["okay","Sedang"],["easy","Mudah"]]
+        .forEach(([value,label]) => {
+          const btn = document.createElement("button");
+          btn.textContent = label;
+          btn.addEventListener("click", () => rateMission(m.id,value));
+          actions.append(btn);
+        });
+
+      item.append(hint,actions);
+    }
+
+    missionBox.append(item);
+  });
+
+  const topicBox = document.getElementById("topics");
+  topicBox.replaceChildren();
+
+  state.topics.forEach(t => {
+    const item = document.createElement("div");
+    item.className = "topic";
+
+    const line = document.createElement("div");
+    line.className = "topic-line";
+
+    const name = document.createElement("span");
+    name.textContent = t.name;
+
+    const score = document.createElement("span");
+    score.className = "tag";
+    score.textContent = `${t.mastery}%`;
+
+    line.append(name,score);
+
+    const track = document.createElement("div");
+    track.className = "track";
+
+    const fill = document.createElement("div");
+    fill.className = "fill";
+    fill.style.width = t.mastery + "%";
+
+    track.append(fill);
+    item.append(line,track);
+    topicBox.append(item);
+  });
+
+  document.getElementById("notes").value = state.notes;
+}
+
+document.getElementById("planBtn").addEventListener("click", buildSchedule);
+
+document.getElementById("saveNote").addEventListener("click", () => {
+  state.notes = document.getElementById("notes").value;
+  saveState();
+  document.getElementById("noteStatus").textContent = "Catatan tersimpan.";
+});
+
+if (!state.missions.length) buildSchedule();
+else render();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("The Fool siap digunakan"))
+      .catch(error => console.error("PWA error:", error));
+  });
+}
+</script>
+
+</body>
+</html>
